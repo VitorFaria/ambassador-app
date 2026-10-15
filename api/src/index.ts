@@ -2,6 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import { AppDataSource } from './data-source';
 import { routes } from './routes';
+import * as dotenv from "dotenv";
+
+
+dotenv.config();
 
 AppDataSource.initialize().then(() => {
   console.log("Data Source has been initialized!");

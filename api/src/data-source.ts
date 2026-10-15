@@ -1,7 +1,5 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import * as dotenv from "dotenv";
-dotenv.config();
 
 console.log("MYSQL_PORT:", process.env.MYSQL_PORT);
 export const AppDataSource = new DataSource({
