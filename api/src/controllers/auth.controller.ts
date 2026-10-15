@@ -5,7 +5,8 @@ import bcrypt from "bcryptjs";
 
 export const Register = async (req: Request, res: Response) => {
   const body = req.body;
-  if (body.password !== body.passwordConfirmation) {
+  console.log(body);
+  if (body.password !== body.password_confirmation) {
     return res.status(400).json({ message: "Passwords do not match" });
   }
 
