@@ -3,6 +3,7 @@ import cors from 'cors';
 import { AppDataSource } from './data-source';
 import { routes } from './routes';
 import * as dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 
 dotenv.config();
@@ -12,6 +13,7 @@ AppDataSource.initialize().then(() => {
 
   const app = express();
 
+  app.use(cookieParser());
   app.use(express.json());
   app.use(cors({
     origin: 'http://localhost:3001',
