@@ -3,7 +3,7 @@ import { User } from "../entities/user.entity";
 import { AppDataSource } from "../data-source";
 import bcrypt from "bcryptjs";
 import { sign, verify } from "jsonwebtoken";
-import { IAuthenticatedUser } from "../types/user.interface";
+import { IAuthenticatedRequest, IAuthenticatedUser } from "../types/user.interface";
 
 export const Register = async (req: Request, res: Response) => {
   const {password, password_confirmation, ...body} = req.body;
@@ -45,19 +45,8 @@ export const Login = async (req: Request, res: Response) => {
   res.status(200).json({ message: "success" });
 }
 
-export const AuthenticatedUser = async (req: Request, res: Response) => {
-  const jwt = req.cookies["jwt"] ?? "";
-
-  if (!jwt) return res.status(401).json({ message: "Unauthenticated" });
-  const payload = verify(jwt, process.env.JWT_SECRET as string) as IAuthenticatedUser;
-
-  if (!payload) {
-    return res.status(401).json({ message: "Unauthenticated" });
-  }
-
-  const user = await AppDataSource.getRepository(User).findOneBy({ id: payload.id });
-
-  res.status(200).json(user);
+export const AuthenticatedUser = async (req: IAuthenticatedRequest, res: Response) => {
+  res.status(200).json(req.user);
 }
 
 export const Logout = async (req: Request, res: Response) => {
