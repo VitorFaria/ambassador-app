@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "nodemon --legacy-watch --exec tsx src/index.ts",
-    "seed:ambassadors": "tsx src/seeders/ambassadors.seeder.ts"
+    "seed:ambassadors": "tsx src/seeders/ambassadors.seeder.ts",
+    "seed:products": "tsx src/seeders/products.seeder.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
