@@ -6,7 +6,7 @@ import { CreateProduct, DeleteProduct, GetProduct, Products, UpdateProduct } fro
 import { Links } from "./controllers/link.controller";
 import { Orders } from "./controllers/order.controller";
 
-export const routes = (router: Router) => {
+export const adminRoutes = (router: Router) => {
   router.post("/register", Register);
   router.post("/login", Login);
   router.get("/user", AuthMiddleware, AuthenticatedUser);
