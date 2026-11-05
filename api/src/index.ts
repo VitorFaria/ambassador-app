@@ -1,9 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import { AppDataSource } from './data-source';
-import { routes } from './routes';
+import { adminRoutes } from './admin.routes';
 import * as dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import { ambassadorRoutes } from './ambassador.routes';
 
 
 dotenv.config();
@@ -19,10 +20,13 @@ AppDataSource.initialize().then(() => {
     origin: 'http://localhost:3001',
   }));
 
-  const router = express.Router();
-  routes(router);
+  const adminRouter = express.Router();
+  adminRoutes(adminRouter);
+  app.use("/api/admin", adminRouter);
 
-  app.use("/api/admin", router);
+  const ambassadorRouter = express.Router();
+  ambassadorRoutes(ambassadorRouter);
+  app.use("/api/ambassador", ambassadorRouter);
 
   app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
