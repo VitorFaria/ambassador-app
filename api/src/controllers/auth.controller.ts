@@ -11,9 +11,11 @@ export const Register = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Passwords do not match" });
   }
 
+  const is_ambassador = req.baseUrl.includes("ambassador");
   const user = await AppDataSource.getRepository(User).save({
     ...body,
     password: await bcrypt.hash(password, 10),
+    is_ambassador
   });
 
   delete user.password;
@@ -24,7 +26,7 @@ export const Register = async (req: Request, res: Response) => {
 export const Login = async (req: Request, res: Response) => {
   const user = await AppDataSource.getRepository(User).findOne({
     where: { email: req.body.email },
-    select: {id: true, password: true}
+    select: {id: true, password: true, is_ambassador: true}
   });
 
   if (!user) {
@@ -33,6 +35,12 @@ export const Login = async (req: Request, res: Response) => {
 
   if (!await bcrypt.compare(req.body.password, user.password)) {
     return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  const is_admin = req.baseUrl.includes("admin");
+
+  if (user.is_ambassador && is_admin) {
+    return res.status(403).json({ message: "Unauthorized" });
   }
 
   const token = sign({id: user.id}, process.env.JWT_SECRET as string);
