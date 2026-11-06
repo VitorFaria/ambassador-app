@@ -8,5 +8,5 @@ export interface IAuthenticatedUser {
 }
 
 export interface IAuthenticatedRequest extends Request {
-  user?: User | null;
+  user?: (User & { revenue?: number }) | null;
 }
