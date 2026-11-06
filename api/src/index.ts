@@ -5,12 +5,19 @@ import { adminRoutes } from './admin.routes';
 import * as dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { ambassadorRoutes } from './ambassador.routes';
+import { createClient } from 'redis';
 
 
 dotenv.config();
 
-AppDataSource.initialize().then(() => {
+export const client = createClient({
+  url: process.env.REDIS_URL
+})
+
+AppDataSource.initialize().then(async () => {
   console.log("Data Source has been initialized!");
+
+  await client.connect();
 
   const app = express();
 
