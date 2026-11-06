@@ -79,5 +79,15 @@ export const ProductsBackend = async (req: Request, res: Response) => {
     })
   }
 
+  if (req.query.sort === 'asc' || req.query.sort === 'desc') {
+    products = products.sort((a: Product, b: Product) => {
+      const diff = a.price - b.price;
+      if (diff === 0) return 0;
+
+      const sign = Math.abs(diff) / diff;
+      return req.query.sort === 'asc' ? sign : -sign;
+    });
+  }
+
   res.send(products);
 }
