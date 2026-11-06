@@ -89,5 +89,19 @@ export const ProductsBackend = async (req: Request, res: Response) => {
     });
   }
 
-  res.send(products);
+  const page = req.query.page ? parseInt(req.query.page as any) : 1;
+  const perPage = 9;
+  const total = products.length;
+
+  const data = products.slice((page - 1) * perPage, page * perPage);
+
+  res.send({
+    data,
+    pagination: {
+      total,
+      perPage,
+      currentPage: page,
+      lastPage: Math.ceil(total / perPage)
+    }
+  });
 }
