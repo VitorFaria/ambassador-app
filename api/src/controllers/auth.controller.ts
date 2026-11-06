@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { IAuthenticatedRequest } from "../types/user.interface";
 import { Role } from "../enums/role.enum";
+import { Order } from "../entities/order.entity";
 
 export const Register = async (req: Request, res: Response) => {
   const {password, password_confirmation, ...body} = req.body;
@@ -60,7 +61,27 @@ export const Login = async (req: Request, res: Response) => {
 }
 
 export const AuthenticatedUser = async (req: IAuthenticatedRequest, res: Response) => {
-  res.status(200).json(req.user);
+  const user = req.user;
+
+  if (req.baseUrl.includes("admin")) {
+    return res.status(200).json(user);
+  }
+
+  const orders = await AppDataSource.getRepository(Order).find({
+    where: {
+      id: user?.id,
+      complete: true
+    },
+    relations: {
+      order_items: true
+    }
+  });
+
+  if (user) {
+    user.revenue = orders.reduce((s: number, o: Order) => s + o.ambassador_revenue, 0);
+  }
+
+  res.send(user);
 }
 
 export const Logout = async (req: Request, res: Response) => {
