@@ -4,6 +4,7 @@ import { AppDataSource } from "../data-source";
 import bcrypt from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { IAuthenticatedRequest } from "../types/user.interface";
+import { Role } from "../enums/role.enum";
 
 export const Register = async (req: Request, res: Response) => {
   const {password, password_confirmation, ...body} = req.body;
@@ -43,7 +44,12 @@ export const Login = async (req: Request, res: Response) => {
     return res.status(403).json({ message: "Unauthorized" });
   }
 
-  const token = sign({id: user.id}, process.env.JWT_SECRET as string);
+  const token = sign(
+    {
+      id: user.id,
+      scope: is_admin ? Role.ADMIN : Role.AMBASSADOR
+    }, 
+    process.env.JWT_SECRET as string);
 
   res.cookie("jwt", token, {
     httpOnly: true,
