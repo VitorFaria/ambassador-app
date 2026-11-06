@@ -10,14 +10,14 @@ import { createClient } from 'redis';
 
 dotenv.config();
 
-export const client = createClient({
+export const redisClient = createClient({
   url: process.env.REDIS_URL
 })
 
 AppDataSource.initialize().then(async () => {
   console.log("Data Source has been initialized!");
 
-  await client.connect();
+  await redisClient.connect();
 
   const app = express();
 
