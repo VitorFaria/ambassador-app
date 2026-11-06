@@ -3,6 +3,7 @@ import { IAuthenticatedRequest, IAuthenticatedUser } from "../types/user.interfa
 import { AppDataSource } from "../data-source";
 import { User } from "../entities/user.entity";
 import { verify } from "jsonwebtoken";
+import { Role } from "../enums/role.enum";
 
 export const AuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -13,9 +14,17 @@ export const AuthMiddleware = async (req: Request, res: Response, next: NextFunc
       return res.status(401).json({ message: "Unauthenticated" });
     }
 
-    const authReq = req as IAuthenticatedRequest;
+    const is_ambassador = req.baseUrl.includes("ambassador");
 
-    authReq.user = await AppDataSource.getRepository(User).findOneBy({ id: payload.id });
+    const auth_req = req as IAuthenticatedRequest;
+    const user = await AppDataSource.getRepository(User).findOneBy({ id: payload.id });
+
+    if ((is_ambassador && payload.scope !== Role.AMBASSADOR) 
+      || (!is_ambassador && payload.scope !== Role.ADMIN)) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    auth_req.user = user;
 
     next();
   } catch (e) {
