@@ -65,4 +65,8 @@ export class Order {
   get total(): number {
     return this.order_items.reduce((s: number, i: OrderItem) => s + i.admin_revenue, 0);
   }
+
+  get ambassador_revenue(): number {
+    return this.order_items.reduce((s: number, i: OrderItem) => s + i.ambassador_revenue, 0);
+  }
 }
