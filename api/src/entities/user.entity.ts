@@ -23,4 +23,8 @@ export class User {
 
   @Column({ type: "boolean", default: false })
   is_ambassador: boolean;
+
+  get fullName(): string {
+    return this.first_name + " " + this.last_name;
+  }
 }
