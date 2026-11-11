@@ -22,7 +22,7 @@ export const Links = async (req: Request, res: Response) => {
   res.send(links);
 }
 
-export const createLink = async (req: IAuthenticatedRequest, res: Response) => {
+export const CreateLink = async (req: IAuthenticatedRequest, res: Response) => {
   const user = req.user;
 
   const link = await AppDataSource.getRepository(Link).save({
@@ -32,4 +32,28 @@ export const createLink = async (req: IAuthenticatedRequest, res: Response) => {
   });
 
   res.send(link);
+}
+
+export const LinkStats = async (req: IAuthenticatedRequest, res: Response) => {
+  const user = req.user;
+  const links = await AppDataSource.getRepository(Link).find({
+    where: { user: { id: user?.id } },
+    relations: {
+      orders: {
+        order_items: true
+      }
+    }
+  });
+
+  const stats = links.map(link => {
+    const orders = link.orders.filter(order => order.complete);
+
+    return {
+      code: link.code,
+      count: orders.length,
+      revenue: orders.reduce((sum, order) => sum + order.ambassadorRevenue, 0),
+    }
+  });
+
+  res.send(stats);
 }
