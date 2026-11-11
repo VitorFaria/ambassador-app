@@ -7,7 +7,8 @@
     "seed:ambassadors": "tsx src/seeders/ambassadors.seeder.ts",
     "seed:products": "tsx src/seeders/products.seeder.ts",
     "seed:links": "tsx src/seeders/links.seeder.ts",
-    "seed:orders": "tsx src/seeders/orders.seeder.ts"
+    "seed:orders": "tsx src/seeders/orders.seeder.ts",
+    "update:rankings": "tsx src/seeders/rankings.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
