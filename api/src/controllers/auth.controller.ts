@@ -78,7 +78,7 @@ export const AuthenticatedUser = async (req: IAuthenticatedRequest, res: Respons
   });
 
   if (user) {
-    user.revenue = orders.reduce((s: number, o: Order) => s + o.ambassador_revenue, 0);
+    user.revenue = orders.reduce((s: number, o: Order) => s + o.ambassadorRevenue, 0);
   }
 
   res.send(user);
