@@ -10,9 +10,17 @@ export const Ambassadors = async (req: Request, res: Response) => {
 }
 
 export const Rankings = async (req: Request, res: Response) => {
-  const result = await redisClient.sendCommand([
-    "ZREVRANGEBYSCORE", "rankings", "+inf", "-inf", "WITHSCORES"
-  ]);
+  const result = await redisClient.zRangeWithScores("rankings", 0, -1, {
+    REV: true,
+  });
 
-  res.send(result);
+  const rankings = result.reduce<Record<string, number>>(
+    (object, { value, score }) => {
+      object[value] = score;
+      return object;
+    },
+    {},
+  );
+
+  res.send(rankings);
 }
