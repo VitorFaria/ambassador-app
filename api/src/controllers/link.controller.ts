@@ -57,3 +57,15 @@ export const LinkStats = async (req: IAuthenticatedRequest, res: Response) => {
 
   res.send(stats);
 }
+
+export const GetLinkByCode = async (req: Request, res: Response) => {
+  const link = await AppDataSource.getRepository(Link).findOne({
+    where: { code: req.params.code },
+    relations: {
+      user: true,
+      products: true
+    }
+  });
+
+  res.send(link);
+}
