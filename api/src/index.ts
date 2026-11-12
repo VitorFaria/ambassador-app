@@ -6,6 +6,7 @@ import * as dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { ambassadorRoutes } from './ambassador.routes';
 import { createClient } from 'redis';
+import { checkoutRoutes } from './checkout.routes';
 
 
 dotenv.config();
@@ -34,6 +35,10 @@ AppDataSource.initialize().then(async () => {
   const ambassadorRouter = express.Router();
   ambassadorRoutes(ambassadorRouter);
   app.use("/api/ambassador", ambassadorRouter);
+
+  const checkoutRouter = express.Router();
+  checkoutRoutes(checkoutRouter);
+  app.use("/api/checkout", checkoutRouter);
 
   app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
