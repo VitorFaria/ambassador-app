@@ -5,6 +5,9 @@ import { Link } from "../entities/link.entity";
 import { Product } from "../entities/product.entity";
 import { OrderItem } from "../entities/order-item.entity";
 import { IProductInput } from "../types/product.interface";
+import { ICheckoutItems } from "../types/checkout.interface";
+import { stripeService } from "../services/stripe.service";
+import { ModePayment, PaymentMethodType } from "../enums/checkout-payment.enum";
 
 class InvalidProductError extends Error {}
 
@@ -39,7 +42,7 @@ export const CreateOrder = async (req: Request, res: Response) => {
   }
 
   try {
-    const order = await AppDataSource.transaction(async (manager) => {
+    const { source } = await AppDataSource.transaction(async (manager) => {
       const newOrder = new Order();
       newOrder.user_id = link.user.id;
       newOrder.ambassador_email = link.user.email;
@@ -54,6 +57,7 @@ export const CreateOrder = async (req: Request, res: Response) => {
 
       const savedOrder = await manager.getRepository(Order).save(newOrder);
 
+      const checkoutItems: ICheckoutItems[] = [];
       for (const p of body.products as IProductInput[]) {
         const product = await manager.getRepository(Product).findOneBy({ id: p.product_id });
 
@@ -64,16 +68,40 @@ export const CreateOrder = async (req: Request, res: Response) => {
         orderItem.product_title = product.title;
         orderItem.price = product.price;
         orderItem.quantity = p.quantity;
-        orderItem.ambassador_revenue = 0.1 * product.price * p.quantity;
-        orderItem.admin_revenue = 0.9 * product.price * p.quantity;
+        orderItem.ambassador_revenue = 0.1 * Number(product.price) * p.quantity;
+        orderItem.admin_revenue = 0.9 * Number(product.price) * p.quantity;
+
+        checkoutItems.push({
+          price_data: {
+            currency: "brl",
+            unit_amount: Math.round(Number(product.price) * 100),
+            product_data: {
+              name: product.title,
+              description: product.description,
+              images: [product.image]
+            }
+          },
+          quantity: p.quantity
+        });
 
         await manager.getRepository(OrderItem).save(orderItem);
       }
 
-      return savedOrder;
+      const source = await stripeService.createCheckoutSession({
+        mode: ModePayment.PAYMENT,
+        allowed_payment_method_types: [PaymentMethodType.CARD],
+        line_items: checkoutItems,
+        success_url: `${process.env.CHECKOUT_URL}/success?source={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.CHECKOUT_URL}/error`
+      });
+      
+      savedOrder.transaction_id = source.id;
+      await manager.getRepository(Order).save(savedOrder);
+
+      return { source };
     });
 
-    return res.send(order);
+    return res.send(source);
   } catch (error) {
     if (error instanceof InvalidProductError) {
       return res.status(400).send({ message: "Invalid product" });
