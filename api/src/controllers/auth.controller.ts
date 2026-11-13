@@ -92,7 +92,6 @@ export const Logout = async (req: Request, res: Response) => {
 
 export const UpdateInfo = async (req: IAuthenticatedRequest, res: Response) => {
   const user = req.user;
-  console.log(user);
   if (!user) return res.status(400).json({ message: "No data sent" });
 
   const repository = AppDataSource.getRepository(User);
