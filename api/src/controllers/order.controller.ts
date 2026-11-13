@@ -7,7 +7,7 @@ import { OrderItem } from "../entities/order-item.entity";
 import { IProductInput } from "../types/product.interface";
 import { ICheckoutItems } from "../types/checkout.interface";
 import { stripeService } from "../services/stripe.service";
-import { ModePayment, PaymentMethodType } from "../enums/checkout-payment.enum";
+import { ModePayment, PaymentCurrency, PaymentMethodType } from "../enums/checkout-payment.enum";
 
 class InvalidProductError extends Error {}
 
@@ -73,7 +73,7 @@ export const CreateOrder = async (req: Request, res: Response) => {
 
         checkoutItems.push({
           price_data: {
-            currency: "brl",
+            currency: PaymentCurrency.BRL,
             unit_amount: Math.round(Number(product.price) * 100),
             product_data: {
               name: product.title,

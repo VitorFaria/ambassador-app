@@ -4,6 +4,11 @@ export enum ModePayment {
   SUBSCRIPTION = "subscription"
 }
 
+export enum PaymentCurrency {
+  BRL = 'brl',
+  USD = 'usd'
+}
+
 export enum PaymentMethodType {
   ACSS_DEBIT = "acss_debit",
   AFFIRM = "affirm",
