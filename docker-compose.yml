@@ -25,6 +25,12 @@ services:
       redis:
         condition: service_healthy
 
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   redis:
     image: redis:7-alpine
     ports:
