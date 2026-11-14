@@ -8,6 +8,9 @@ import { IProductInput } from "../types/product.interface";
 import { ICheckoutItems } from "../types/checkout.interface";
 import { stripeService } from "../services/stripe.service";
 import { ModePayment, PaymentCurrency, PaymentMethodType } from "../enums/checkout-payment.enum";
+import { User } from "../entities/user.entity";
+import { redisClient } from "..";
+import { emailService } from "../services/email.service";
 
 class InvalidProductError extends Error {}
 
@@ -108,5 +111,65 @@ export const CreateOrder = async (req: Request, res: Response) => {
     }
 
     throw error;
+  }
+}
+
+export const ConfirmOrder = async (req: Request, res: Response) => {
+  try {
+    const { order, shouldSendEmail } = await AppDataSource.transaction(async (manager) => {
+      const order = await manager.getRepository(Order).findOne({
+        where: { transaction_id: req.body.source },
+        relations: { order_items: true },
+        lock: { mode: "pessimistic_write" },
+      });
+
+      if (!order) throw new Error("ORDER_NOT_FOUND");
+
+      if (order.complete) return { order, shouldSendEmail: false};
+
+      const user = await manager
+        .getRepository(User)
+        .findOneBy({ id: order.user_id });
+
+      if (!user) throw new Error("ORDER_USER_NOT_FOUND");
+
+      order.complete = true;
+      await manager.getRepository(Order).update(order.id, {complete: order.complete});
+
+      await redisClient.zIncrBy(
+        "rankings",
+        order.ambassadorRevenue,
+        user.fullName,
+      );
+
+      return {order, shouldSendEmail: true};
+    });
+
+    if (shouldSendEmail) {
+      const subject = 'An order has been completed';
+      await emailService.sendEmail({
+        from: process.env.EMAIL_FROM,
+        to: 'admin@admin.com',
+        subject,
+        html: `Order #${order.id} with a total of $${order.total} has been completed`
+      });
+      await emailService.sendEmail({
+        from: process.env.EMAIL_FROM,
+        to: order.ambassador_email,
+        subject,
+        html: `You earned $${order.ambassadorRevenue} from the link #${order.code}`
+      });
+    }
+
+    return res.send({ message: "Order confirmed" });
+  } catch (error) {
+    if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
+      return res.status(404).send({ message: "Order not found" });
+    }
+
+    console.error("Order confirmation failed:", error);
+    return res.status(500).send({
+      message: "Order confirmation was not completed",
+    });
   }
 }
