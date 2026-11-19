@@ -1,4 +1,18 @@
 services:
+  vue-admin:
+    build:
+      context: ./vue-admin
+      dockerfile: Dockerfile
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./vue-admin:/app
+      - ./vue-admin/node_modules:/app/node_modules
+    environment:
+      NODE_ENV: development
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
   app:
     build:
       context: .
