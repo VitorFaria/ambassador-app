@@ -4,6 +4,7 @@ import store from '@/store'
 import HomeView from '../views/HomeView.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
+import UsersTable from '@/components/UsersTable.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,10 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      children: [
+        { path: '/', redirect: '/users' },
+        { path: '/users', component: UsersTable}
+      ],
       meta: { requiresAuth: true },
     },
   ],
