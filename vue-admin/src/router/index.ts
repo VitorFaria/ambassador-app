@@ -1,4 +1,6 @@
+import axios from 'axios'
 import { createRouter, createWebHistory } from 'vue-router'
+import store from '@/store'
 import HomeView from '../views/HomeView.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
@@ -20,8 +22,26 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      meta: { requiresAuth: true },
     },
   ],
+})
+
+router.beforeEach(async (to) => {
+  if (!to.meta.requiresAuth || store.state.user) {
+    return true
+  }
+
+  try {
+    await store.dispatch('fetchAuthenticatedUser')
+    return store.state.user ? true : { name: 'login' }
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      return { name: 'login' }
+    }
+
+    throw error
+  }
 })
 
 export default router
