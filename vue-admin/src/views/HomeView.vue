@@ -11,4 +11,11 @@
 
 <script setup lang="ts">
 import OrdersTable from '@/components/OrdersTable.vue'
+import type { RootState } from '@/store';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
+  const store = useStore<RootState>()
+  const user = computed(() => store.state.user)
+  console.log(user.value?.email);
 </script>
