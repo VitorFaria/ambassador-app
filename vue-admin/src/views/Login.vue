@@ -55,6 +55,7 @@ import AppTextField from '@/components/AppTextField.vue';
 import { api } from '@/services/api'
 import { ref } from 'vue'
 import router from '@/router'
+import store from '@/store';
 
   const form = ref()
   const email = ref('')
@@ -85,6 +86,7 @@ import router from '@/router'
         password: password.value
       })
 
+      await store.dispatch('fetchAuthenticatedUser')
       await router.push('/')
     } catch (err) {
       errorMessage.value = err instanceof Error ? err.message : 'Something went wrong.'
