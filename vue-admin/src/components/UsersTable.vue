@@ -12,12 +12,27 @@
         hide-details
       />
 
-      <v-data-table :headers="headers" :items="users" :search="search" />
+      <v-data-table 
+        :headers="headers" 
+        :items="users" 
+        :search="search"
+      >
+        <template #item.actions="{ item }">
+          <v-btn
+            size="small"
+            variant="tonal"
+            color="primary"
+            icon="mdi-eye-outline"
+            @click="showUserLinks(item)"
+          />
+        </template>
+      </v-data-table>
     </div>
   </v-app>
 </template>
 
 <script setup lang="ts">
+import router from '@/router'
 import { api } from '@/services/api'
 import type { IAuthenticatedUser } from '@/store'
 import { onMounted, ref } from 'vue'
@@ -49,4 +64,8 @@ import { onMounted, ref } from 'vue'
       users.value = []
     }
   })
+
+  function showUserLinks(user: IAuthenticatedUser) {
+    router.push({ name: 'user-links', params: {id: user.id}})
+  }
 </script>
