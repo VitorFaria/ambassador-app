@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-app-bar>
+        <v-app-bar-nav-icon @click="drawer = !drawer"/>
       <v-app-bar-title>Admin Checkout</v-app-bar-title>
       <v-spacer />
       <span v-if="user" class="mr-4">
@@ -17,6 +18,13 @@
         Sign out
       </v-btn>
     </v-app-bar>
+
+    <v-navigation-drawer v-model="drawer">
+      <v-list nav>
+        <v-list-item title="Users" to="/users"></v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
     <v-main><router-view /></v-main>
     <v-snackbar v-model="showSignOutError" color="error" timeout="5000">
       {{ signOutError }}
@@ -30,6 +38,7 @@ import { api } from '@/services/api'
 import router from '@/router'
 import store from '@/store'
 
+const drawer = ref(true)
 const user = computed(() => store.state.user)
 const isSigningOut = ref(false)
 const showSignOutError = ref(false)
