@@ -1,13 +1,7 @@
 import { api } from '@/services/api'
+import type { IAuthenticatedUser } from '@/types/user.interface'
 import { createStore } from 'vuex'
 
-export interface IAuthenticatedUser {
-  id: number
-  first_name: string
-  last_name: string
-  email: string
-  is_ambassador: boolean
-}
 
 export interface RootState {
   appName: string

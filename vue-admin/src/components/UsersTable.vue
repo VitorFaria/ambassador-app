@@ -4,7 +4,7 @@
       <v-text-field
         v-model="search"
         class="mb-4"
-        label="Search orders"
+        label="Search ambassadors"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         density="comfortable"
@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import router from '@/router'
 import { api } from '@/services/api'
-import type { IAuthenticatedUser } from '@/store'
+import type { IAuthenticatedUser } from '@/types/user.interface'
 import { onMounted, ref } from 'vue'
 
   const search = ref('')
