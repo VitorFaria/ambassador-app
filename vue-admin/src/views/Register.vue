@@ -60,6 +60,9 @@
             >Sign Up</v-btn>
         </v-form>
       </v-card-text>
+      <span class="d-flex justify-center ma-3">
+        Já tem uma conta? <router-link class="ml-1 text-primary text-decoration-none" to="/login">Fazer Login</router-link>
+      </span>
     </v-card>
   </main>
 </template>
