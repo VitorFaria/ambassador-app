@@ -19,7 +19,15 @@ export const Links = async (req: Request, res: Response) => {
     }
   });
 
-  res.send(links);
+  const payload = links.map((link) => ({
+    ...link,
+    orders: link.orders?.map((order) => ({
+      ...order,
+      total: order.total
+    }))
+  }));
+
+  res.send(payload);
 }
 
 export const CreateLink = async (req: IAuthenticatedRequest, res: Response) => {
