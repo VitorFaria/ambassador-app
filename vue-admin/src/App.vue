@@ -23,6 +23,9 @@
       <v-list nav>
         <v-list-item title="Users" to="/users"></v-list-item>
       </v-list>
+      <v-list nav>
+        <v-list-item title="Products" to="/products"></v-list-item>
+      </v-list>
     </v-navigation-drawer>
 
     <v-main><router-view /></v-main>

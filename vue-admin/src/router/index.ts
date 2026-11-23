@@ -6,6 +6,7 @@ import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 import UsersTable from '@/components/UsersTable.vue'
 import Link from '@/views/Link.vue'
+import Products from '@/views/product/Products.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,7 +28,8 @@ const router = createRouter({
       children: [
         { path: '/', name: 'home-redirect', redirect: '/users' },
         { path: '/users', name: 'users', component: UsersTable},
-        { path: '/user/:id/link', name: 'user-links', component: Link}
+        { path: '/user/:id/link', name: 'user-links', component: Link},
+        { path: '/products', name: 'products', component: Products},
       ],
       meta: { requiresAuth: true },
     },
