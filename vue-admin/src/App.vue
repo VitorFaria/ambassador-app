@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar>
-        <v-app-bar-nav-icon @click="drawer = !drawer"/>
+      <v-app-bar-nav-icon v-if="user" @click="drawer = !drawer"/>
       <v-app-bar-title>Admin Checkout</v-app-bar-title>
       <v-spacer />
       <span v-if="user" class="mr-4">
@@ -19,7 +19,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer">
+    <v-navigation-drawer v-if="user" v-model="drawer">
       <v-list nav>
         <v-list-item title="Users" to="/users"></v-list-item>
       </v-list>
@@ -33,16 +33,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { api } from '@/services/api'
 import router from '@/router'
 import store from '@/store'
 
-const drawer = ref(true)
+const drawer = ref(false)
 const user = computed(() => store.state.user)
 const isSigningOut = ref(false)
 const showSignOutError = ref(false)
 const signOutError = ref('')
+
+watch(user, (authenticatedUser) => {
+  if (!authenticatedUser) {
+    drawer.value = false
+  }
+})
 
 async function signOut() {
   isSigningOut.value = true
@@ -54,7 +60,7 @@ async function signOut() {
     await router.replace({ name: 'login' })
   } catch (error) {
     signOutError.value =
-      error instanceof Error ? error.message : 'Could not sign out. Please try again.'
+    error instanceof Error ? error.message : 'Could not sign out. Please try again.'
     showSignOutError.value = true
   } finally {
     isSigningOut.value = false
