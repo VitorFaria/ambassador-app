@@ -2,6 +2,7 @@
 import { api } from '@/services/api'
 import { onMounted, ref } from 'vue'
 import ConfirmDialog from './ConfirmDialog.vue'
+import type { IProduct } from '@/types/product.interface.ts'
 
   const search = ref('')
   const products = ref<IProduct[]>([])
@@ -10,13 +11,6 @@ import ConfirmDialog from './ConfirmDialog.vue'
   const selectedProduct = ref<IProduct | null>(null)
   const errorMessage = ref<string | null>(null)
 
-  interface IProduct {
-    id: number;
-    title: string
-    description: string
-    image: string
-  }
-
   const headers = [
     { title: '#', key: 'id'},
     { 
@@ -24,6 +18,7 @@ import ConfirmDialog from './ConfirmDialog.vue'
       key: 'title', 
     },
     { title: 'Description', key: 'description' },
+    { title: 'Unit Price', key: 'price' },
     { title: 'Image', key: 'image' },
     { title: 'Actions', key: 'actions' },
   ]
@@ -97,13 +92,24 @@ import ConfirmDialog from './ConfirmDialog.vue'
           />
         </template>
         <template #item.actions="{ item }">
-          <v-btn
-            size="small"
-            variant="tonal"
-            color="error"
-            icon="mdi-delete-outline"
-            @click="openDeleteConfirm(item)"
-          />
+          <div class="d-flex align-center justify-end ga-2 flex-nowrap">
+            <v-btn
+              size="small"
+              variant="tonal"
+              color="info"
+              icon="mdi-pencil-outline"
+              title="Edit Product"
+              :to="`/products/${item.id}/edit`"
+            />
+            <v-btn
+              size="small"
+              variant="tonal"
+              color="error"
+              icon="mdi-delete-outline"
+              title="Delete Product"
+              @click="openDeleteConfirm(item)"
+            />
+          </div>
 
           <ConfirmDialog
             v-model="confirmDialog"
