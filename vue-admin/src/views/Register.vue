@@ -23,7 +23,7 @@
             v-model="lastName"
             label="Last name"
             type="input"
-            autocomplete="family-name"
+            autocomplete="last-name"
             :rules="nameRules"
           />
           <AppTextField
