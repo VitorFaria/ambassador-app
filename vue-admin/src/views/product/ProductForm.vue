@@ -11,7 +11,8 @@ import { VFileUpload } from 'vuetify/labs/VFileUpload'
 const productForm = ref()
 const title = ref('')
 const description = ref('')
-const image = ref('')
+const imageUrl = ref('')
+const imageKey = ref('')
 const price = ref(0)
 const selectedFile = ref<File | File[]>()
 const errorMessage = ref<string | null>(null)
@@ -51,7 +52,8 @@ onMounted(async() => {
       
       title.value = data.title
       description.value = data.description
-      image.value = data.image
+      imageUrl.value = data.image_url
+      imageKey.value = data.image_key
       price.value = data.price
     }
   } catch (err) {
@@ -64,7 +66,8 @@ async function handleImageUpload(files: File | File[] | null) {
   uploadError.value = null
 
   if (!files) {
-    image.value = ''
+    imageUrl.value = ''
+    imageKey.value = ''
     return
   }
 
@@ -72,14 +75,16 @@ async function handleImageUpload(files: File | File[] | null) {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     uploadError.value = 'Only JPEG, PNG, and WebP images are allowed.'
     selectedFile.value = []
-    image.value = ''
+    imageUrl.value = ''
+    imageKey.value = ''
     return
   }
 
   if (file.size > MAX_IMAGE_BYTES) {
     uploadError.value = 'Image must be 5 MB or smaller.'
     selectedFile.value = []
-    image.value = ''
+    imageUrl.value = ''
+    imageKey.value = ''
     return
   }
 
@@ -91,10 +96,12 @@ async function handleImageUpload(files: File | File[] | null) {
 
     const { data } = await api.post<UploadImageResponse>('/products/upload-image', formData)
 
-    image.value = data.url
+    imageUrl.value = data.url
+    imageKey.value = data.key
     await productForm.value.validate()
   } catch (err) {
-    image.value = ''
+    imageUrl.value = ''
+    imageKey.value = ''
     selectedFile.value = []
     const apiMessage =
       (err as { response?: { data?: { message?: string } } })?.response?.data?.message
@@ -116,7 +123,8 @@ async function saveProduct() {
     const data: IProduct = {
       title: title.value,
       description: description.value,
-      image: image.value,
+      image_url: imageUrl.value,
+      image_key: imageKey.value,
       price: price.value
     }
 
@@ -172,7 +180,7 @@ async function saveProduct() {
         />
   
         <v-input
-          v-model="image"
+          v-model="imageUrl"
           :rules="imageRules"
           class="d-none"
         />

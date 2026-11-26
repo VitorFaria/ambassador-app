@@ -19,7 +19,7 @@ import type { IProduct } from '@/types/product.interface.ts'
     },
     { title: 'Description', key: 'description' },
     { title: 'Unit Price', key: 'price' },
-    { title: 'Image', key: 'image' },
+    { title: 'Image', key: 'image_url' },
     { title: 'Actions', key: 'actions' },
   ]
 
@@ -82,7 +82,7 @@ import type { IProduct } from '@/types/product.interface.ts'
         :items="products" 
         :search="search"
       >
-        <template #item.image="{ item, value }">
+        <template #item.image_url="{ item, value }">
           <img
             :src="value"
             :alt="item.title"
