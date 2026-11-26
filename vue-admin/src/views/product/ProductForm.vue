@@ -4,7 +4,7 @@ import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from '@/config/upload';
 import router from '@/router';
 import { api } from '@/services/api';
 import type { IProduct } from '@/types/product.interface';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { VFileUpload } from 'vuetify/labs/VFileUpload'
 
@@ -15,12 +15,17 @@ const imageUrl = ref('')
 const imageKey = ref('')
 const price = ref(0)
 const selectedFile = ref<File | File[]>()
+const hasReplacedImage = ref(false)
 const errorMessage = ref<string | null>(null)
 const uploadError = ref<string | null>(null)
 const isSubmitting = ref(false)
 const isUploadingImage = ref(false)
 const route = useRoute()
 const productId = route.params.id ?? null
+
+const showExistingImagePreview = computed(
+  () => productId && Boolean(imageUrl.value) && !hasReplacedImage.value && !isUploadingImage.value
+)
 
 interface UploadImageResponse {
   url: string
@@ -55,6 +60,7 @@ onMounted(async() => {
       imageUrl.value = data.image_url
       imageKey.value = data.image_key
       price.value = data.price
+      hasReplacedImage.value = false
     }
   } catch (err) {
     errorMessage.value = err instanceof Error ? err.message : 'No data retrieved from current product.'
@@ -64,14 +70,17 @@ onMounted(async() => {
 
 async function handleImageUpload(files: File | File[] | null) {
   uploadError.value = null
+  const file = Array.isArray(files) ? files[0] : files
 
-  if (!files) {
+  if (!file) {
     imageUrl.value = ''
     imageKey.value = ''
+    hasReplacedImage.value = true
     return
   }
 
-  const file = Array.isArray(files) ? files[0] : files
+  hasReplacedImage.value = true
+
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     uploadError.value = 'Only JPEG, PNG, and WebP images are allowed.'
     selectedFile.value = []
@@ -170,6 +179,18 @@ async function saveProduct() {
         :rules="descriptionRules"
       />
       <div class="mb-5">
+        <div v-if="showExistingImagePreview" class="mb-3">
+          <div class="text-caption text-medium-emphasis mb-1">
+            Current product image
+          </div>
+          <img
+            :src="imageUrl"
+            alt="Current product image"
+            width="96"
+            height="96"
+            class="existing-image-preview"
+          />
+        </div>
         <v-file-upload
           v-model="selectedFile"
           density="compact" 
@@ -214,3 +235,12 @@ async function saveProduct() {
     </v-form>
   </v-container>
 </template>
+
+<style scoped>
+.existing-image-preview {
+  display: block;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+</style>
