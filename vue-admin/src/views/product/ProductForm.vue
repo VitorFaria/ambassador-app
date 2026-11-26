@@ -1,20 +1,30 @@
 <script setup lang="ts">
 import AppTextField from '@/components/AppTextField.vue';
+import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from '@/config/upload';
 import router from '@/router';
 import { api } from '@/services/api';
 import type { IProduct } from '@/types/product.interface';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { VFileUpload } from 'vuetify/labs/VFileUpload'
 
 const productForm = ref()
 const title = ref('')
 const description = ref('')
 const image = ref('')
 const price = ref(0)
+const selectedFile = ref<File | File[]>()
 const errorMessage = ref<string | null>(null)
+const uploadError = ref<string | null>(null)
 const isSubmitting = ref(false)
+const isUploadingImage = ref(false)
 const route = useRoute()
 const productId = route.params.id ?? null
+
+interface UploadImageResponse {
+  url: string
+  key: string
+}
 
 const titleRules = [
   (value: string) => !!value?.trim() || 'This field is required.',
@@ -24,6 +34,10 @@ const titleRules = [
 const descriptionRules = [
   (value: string) => !!value?.trim() || 'This field is required.',
   (value: string) => value.length >= 10 || 'Description must have at least 10 characters.'
+]
+
+const imageRules = [
+  (value: string) => !!value?.trim() || 'Please upload a product image.',
 ]
 
 const priceRules = [
@@ -45,6 +59,51 @@ onMounted(async() => {
     console.error(errorMessage)
   }
 })
+
+async function handleImageUpload(files: File | File[] | null) {
+  uploadError.value = null
+
+  if (!files) {
+    image.value = ''
+    return
+  }
+
+  const file = Array.isArray(files) ? files[0] : files
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    uploadError.value = 'Only JPEG, PNG, and WebP images are allowed.'
+    selectedFile.value = []
+    image.value = ''
+    return
+  }
+
+  if (file.size > MAX_IMAGE_BYTES) {
+    uploadError.value = 'Image must be 5 MB or smaller.'
+    selectedFile.value = []
+    image.value = ''
+    return
+  }
+
+  isUploadingImage.value = true
+
+  try {
+    const formData = new FormData()
+    formData.append('image', file)
+
+    const { data } = await api.post<UploadImageResponse>('/products/upload-image', formData)
+
+    image.value = data.url
+    await productForm.value.validate()
+  } catch (err) {
+    image.value = ''
+    selectedFile.value = []
+    const apiMessage =
+      (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+    uploadError.value =
+      apiMessage || (err instanceof Error ? err.message : 'Image upload failed.')
+  } finally {
+    isUploadingImage.value = false
+  }
+}
 
 async function saveProduct() {
   errorMessage.value = null
@@ -102,13 +161,30 @@ async function saveProduct() {
         variant="underlined"
         :rules="descriptionRules"
       />
-
-      <AppTextField
-        v-model="image"
-        label="Upload Image"
-        type="input"
-        autocomplete="image"
-      />
+      <div class="mb-5">
+        <v-file-upload
+          v-model="selectedFile"
+          density="compact" 
+          variant="compact"
+          accept="image/jpeg,image/png,image/webp"
+          :disabled="isUploadingImage || isSubmitting"
+          @update:model-value="handleImageUpload"
+        />
+  
+        <v-input
+          v-model="image"
+          :rules="imageRules"
+          class="d-none"
+        />
+  
+        <div v-if="isUploadingImage" class="text-caption text-medium-emphasis mt-1">
+          Uploading image...
+        </div>
+  
+        <div v-if="uploadError" class="text-caption text-error mt-1">
+          {{ uploadError }}
+        </div>
+      </div>
 
       <AppTextField
         v-model="price"
@@ -123,7 +199,7 @@ async function saveProduct() {
         color="primary" 
         variant="flat"
         :loading="isSubmitting"
-        :disabled="isSubmitting"
+        :disabled="isSubmitting || isUploadingImage"
         >
         Save Product
       </v-btn>
