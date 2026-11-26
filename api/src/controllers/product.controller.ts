@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Product } from "../entities/product.entity";
 import { redisClient } from "..";
+import { productImageUploadService, UploadServiceError } from "../services/upload-image.service";
+import { StorageHttpError } from "../storage/local-storage-provider";
+import 'multer';
 
 export const Products = async (req: Request, res: Response) => {
   res.send(await AppDataSource.getRepository(Product).find());
@@ -104,4 +107,23 @@ export const ProductsBackend = async (req: Request, res: Response) => {
       lastPage: Math.ceil(total / perPage)
     }
   });
+}
+
+export const UploadImage = async (req: Request, res: Response) => {
+  try {
+    const file = (req as Request & { file?: Express.Multer.File }).file;
+    console.log('Content-Type:', req.headers['content-type']);
+    console.log('req.file:', req.body, file);
+    const result = await productImageUploadService.upload(file);
+
+    return res.status(201).json(result);
+  } catch (err: unknown) {
+    if (
+      err instanceof UploadServiceError ||
+      err instanceof StorageHttpError
+    ) {
+      return res.status(err.statusCode).json({ message: err.message });
+    }
+    return res.status(500).json({ message: 'An error ocurred while uploading image'});
+  }
 }
