@@ -31,8 +31,12 @@ export const GetProduct = async (req: Request, res: Response) => {
 
 export const UpdateProduct = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
+  const product = await getProductById(id);
   const repository = AppDataSource.getRepository(Product);
-
+  const hasReplacedImage = product?.image_key !== req.body.image_key
+  if (hasReplacedImage) {
+    productImageUploadService.remove(product?.image_key);
+  }
   await repository.update(id, req.body);
 
   res.status(202).send(await getProductById(id));
