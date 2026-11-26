@@ -81,7 +81,7 @@ export const CreateOrder = async (req: Request, res: Response) => {
             product_data: {
               name: product.title,
               description: product.description,
-              images: [product.image]
+              images: [product.image_url]
             }
           },
           quantity: p.quantity

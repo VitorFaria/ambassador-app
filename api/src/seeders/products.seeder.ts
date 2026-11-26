@@ -12,7 +12,8 @@ AppDataSource.initialize().then(async () => {
     await repository.save({
       title: faker.lorem.words(2),
       description: faker.lorem.words(10),
-      image: faker.image.url({ width: 200, height: 200}),
+      image_url: faker.image.url({ width: 200, height: 200}),
+      image_key: `products/${faker.string.uuid()}.jpg`,
       price: randomInt(10,100),
     });
   }
