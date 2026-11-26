@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { ambassadorRoutes } from './ambassador.routes';
 import { createClient } from 'redis';
 import { checkoutRoutes } from './checkout.routes';
+import path from 'node:path';
 
 
 dotenv.config();
@@ -21,12 +22,15 @@ AppDataSource.initialize().then(async () => {
   await redisClient.connect();
 
   const app = express();
+  const uploadRoot = path.resolve(process.env.UPLOAD_DIR || 'uploads');
 
   app.use(cookieParser());
   app.use(express.json());
   app.use(cors({
     origin: 'http://localhost:3001',
   }));
+
+  app.use('/uploads', express.static(uploadRoot));
 
   const adminRouter = express.Router();
   adminRoutes(adminRouter);
