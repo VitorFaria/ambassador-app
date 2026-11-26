@@ -16,9 +16,13 @@ export const CreateProduct = async (req: Request, res: Response) => {
   res.status(201).send(product);
 }
 
+const getProductById = async (id: number) => {
+  return await AppDataSource.getRepository(Product).findOneBy({ id });
+};
+
 export const GetProduct = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const product = await AppDataSource.getRepository(Product).findOneBy({ id });
+  const product = await getProductById(id);
 
   if (!product) return res.status(404).json({ message: "Product not found" });
 
@@ -31,11 +35,21 @@ export const UpdateProduct = async (req: Request, res: Response) => {
 
   await repository.update(id, req.body);
 
-  res.status(202).send(await repository.findOneBy({ id }));
+  res.status(202).send(await getProductById(id));
 }
 
 export const DeleteProduct = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const product = await getProductById(id)
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
   await AppDataSource.getRepository(Product).delete(req.params.id);
+  if (product?.image_key) {
+    productImageUploadService.remove(product.image_key);
+  }
 
   res.status(204).send(null);
 }
