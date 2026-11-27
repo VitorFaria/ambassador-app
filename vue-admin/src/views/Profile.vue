@@ -2,6 +2,7 @@
 import AppTextField from '@/components/AppTextField.vue';
 import { api } from '@/services/api';
 import type { RootState } from '@/store';
+import type { IAuthenticatedUser } from '@/types/user.interface';
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 
@@ -24,7 +25,7 @@ import { useStore } from 'vuex';
     (value: string) => !!value?.trim() || 'This field is required.',
     (value: string) => value.length >= 3 || 'First Name must have at least 3 characters.'
   ]
-  console.log(firstNameRules)
+
   const lastNameRules = [
     (value: string) => !!value?.trim() || 'This field is required.',
     (value: string) => value.length >= 3 || 'Last Name must have at least 3 characters.'
@@ -59,11 +60,13 @@ import { useStore } from 'vuex';
     isSubmitting.value = true
 
     try {
-      await api.put('/user/info', {
+      const { data } = await api.put<IAuthenticatedUser>('/user/info', {
         first_name: firstName.value,
         last_name: lastName.value,
         email: email.value
       })
+
+      store.commit('setUser', data)
     } catch (err) {
       errorMessage.value = err instanceof Error ? err.message : 'Something went wrong.'
       console.error(errorMessage)
