@@ -1,3 +1,39 @@
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { api } from '@/services/api'
+import router from '@/router'
+import store from '@/store'
+
+  const drawer = ref(false)
+  const user = computed(() => store.state.user)
+  const isSigningOut = ref(false)
+  const showSignOutError = ref(false)
+  const signOutError = ref('')
+
+  watch(user, (authenticatedUser) => {
+    if (!authenticatedUser) {
+      drawer.value = false
+    }
+  })
+
+  async function signOut() {
+    isSigningOut.value = true
+    showSignOutError.value = false
+
+    try {
+      await api.post('/logout')
+      store.commit('setUser', null)
+      await router.replace({ name: 'login' })
+    } catch (error) {
+      signOutError.value =
+      error instanceof Error ? error.message : 'Could not sign out. Please try again.'
+      showSignOutError.value = true
+    } finally {
+      isSigningOut.value = false
+    }
+  }
+</script>
+
 <template>
   <v-app>
     <v-app-bar>
@@ -45,39 +81,3 @@
     </v-snackbar>
   </v-app>
 </template>
-
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { api } from '@/services/api'
-import router from '@/router'
-import store from '@/store'
-
-const drawer = ref(false)
-const user = computed(() => store.state.user)
-const isSigningOut = ref(false)
-const showSignOutError = ref(false)
-const signOutError = ref('')
-
-watch(user, (authenticatedUser) => {
-  if (!authenticatedUser) {
-    drawer.value = false
-  }
-})
-
-async function signOut() {
-  isSigningOut.value = true
-  showSignOutError.value = false
-
-  try {
-    await api.post('/logout')
-    store.commit('setUser', null)
-    await router.replace({ name: 'login' })
-  } catch (error) {
-    signOutError.value =
-    error instanceof Error ? error.message : 'Could not sign out. Please try again.'
-    showSignOutError.value = true
-  } finally {
-    isSigningOut.value = false
-  }
-}
-</script>

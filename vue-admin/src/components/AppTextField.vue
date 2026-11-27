@@ -1,18 +1,3 @@
-<template>
-  <v-text-field
-    v-model="model"
-    v-bind="$attrs"
-    class="mb-2"
-    variant="outlined"
-    :label="label"
-    :type="inputType"
-    :prepend-inner-icon="icon"
-    :error-messages="errorMessages"
-    :append-inner-icon="isPassword ? (showPassword ? 'mdi-eye-off' : 'mdi-eye') : undefined"
-    @click:append-inner="showPassword = !showPassword"
-  />
-</template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
@@ -39,3 +24,18 @@ import { computed, ref } from 'vue';
     return showPassword.value ? 'text' : 'password'
   })
 </script>
+
+<template>
+  <v-text-field
+    v-model="model"
+    v-bind="$attrs"
+    class="mb-2"
+    variant="outlined"
+    :label="label"
+    :type="inputType"
+    :prepend-inner-icon="icon"
+    :error-messages="errorMessages"
+    :append-inner-icon="isPassword ? (showPassword ? 'mdi-eye-off' : 'mdi-eye') : undefined"
+    @click:append-inner="showPassword = !showPassword"
+  />
+</template>

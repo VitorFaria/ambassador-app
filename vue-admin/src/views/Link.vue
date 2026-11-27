@@ -1,35 +1,3 @@
-<template>
-  <v-table theme="dark">
-    <thead>
-      <tr>
-        <th class="text-left">
-          #
-        </th>
-        <th class="text-left">
-          Code
-        </th>
-        <th class="text-left">
-          Count
-        </th>
-        <th class="text-left">
-          Revenue
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="link in links"
-        :key="link.id"
-      >
-        <td>{{ link.id }}</td>
-        <td>{{ link.code }}</td>
-        <td>{{ link.orders.length }}</td>
-        <td>{{ revenueTotal.toFixed(2) }}</td>
-      </tr>
-    </tbody>
-  </v-table>
-</template>
-
 <script setup lang="ts">
 import { api } from '@/services/api';
 import { computed, onMounted, ref } from 'vue';
@@ -71,3 +39,35 @@ import { useRoute } from 'vue-router';
   }, 0)
 })
 </script>
+
+<template>
+  <v-table theme="dark">
+    <thead>
+      <tr>
+        <th class="text-left">
+          #
+        </th>
+        <th class="text-left">
+          Code
+        </th>
+        <th class="text-left">
+          Count
+        </th>
+        <th class="text-left">
+          Revenue
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        v-for="link in links"
+        :key="link.id"
+      >
+        <td>{{ link.id }}</td>
+        <td>{{ link.code }}</td>
+        <td>{{ link.orders.length }}</td>
+        <td>{{ revenueTotal.toFixed(2) }}</td>
+      </tr>
+    </tbody>
+  </v-table>
+</template>

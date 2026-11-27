@@ -1,3 +1,61 @@
+<script setup lang="ts">
+import AppTextField from '@/components/AppTextField.vue'
+import router from '@/router'
+import { api } from '@/services/api'
+import { ref } from 'vue'
+
+  const form = ref()
+  const firstName = ref('')
+  const lastName = ref('')
+  const email = ref('')
+  const password = ref('')
+  const passwordConfirmation = ref('')
+  const errorMessage = ref<string | null>(null)
+  const isSubmitting = ref(false)
+
+  const nameRules = [
+    (value: string) => !!value?.trim() || 'This field is required.'
+  ]
+  const emailRules = [
+    (value: string) => !!value?.trim() || 'Email is required.',
+    (value: string) => /.+@.+\..+/.test(value) || 'Enter a valid email address.'
+  ]
+  const passwordRules = [
+    (value: string) => !!value || 'Password is required.',
+    (value: string) => value.length >= 8 || 'Password must be at least 8 characters.'
+  ]
+  const confirmPasswordRules = [
+    (value: string) => !!value || 'Please confirm your password.',
+    (value: string) => value === password.value || 'Passwords do not match.'
+  ]
+
+  async function handleSignUp() {
+    errorMessage.value = null
+
+    const { valid } = await form.value.validate()
+    if (!valid) return
+
+    isSubmitting.value = true
+
+    try {
+      await api.post('/register', {
+        first_name: firstName.value,
+        last_name: lastName.value,
+        email: email.value,
+        password: password.value,
+        password_confirmation: passwordConfirmation.value
+      })
+
+      await router.push('/login')
+    } catch (err) {
+      errorMessage.value = err instanceof Error ? err.message : 'Something went wrong.'
+      console.error(errorMessage)
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+</script>
+
 <template>
   <main class="register-page">
     <v-card class="register-card pa-6" rounded="lg" elevation="4">
@@ -66,64 +124,6 @@
     </v-card>
   </main>
 </template>
-
-<script setup lang="ts">
-import AppTextField from '@/components/AppTextField.vue'
-import router from '@/router'
-import { api } from '@/services/api'
-import { ref } from 'vue'
-
-  const form = ref()
-  const firstName = ref('')
-  const lastName = ref('')
-  const email = ref('')
-  const password = ref('')
-  const passwordConfirmation = ref('')
-  const errorMessage = ref<string | null>(null)
-  const isSubmitting = ref(false)
-
-  const nameRules = [
-    (value: string) => !!value?.trim() || 'This field is required.'
-  ]
-  const emailRules = [
-    (value: string) => !!value?.trim() || 'Email is required.',
-    (value: string) => /.+@.+\..+/.test(value) || 'Enter a valid email address.'
-  ]
-  const passwordRules = [
-    (value: string) => !!value || 'Password is required.',
-    (value: string) => value.length >= 8 || 'Password must be at least 8 characters.'
-  ]
-  const confirmPasswordRules = [
-    (value: string) => !!value || 'Please confirm your password.',
-    (value: string) => value === password.value || 'Passwords do not match.'
-  ]
-
-  async function handleSignUp() {
-    errorMessage.value = null
-
-    const { valid } = await form.value.validate()
-    if (!valid) return
-
-    isSubmitting.value = true
-
-    try {
-      await api.post('/register', {
-        first_name: firstName.value,
-        last_name: lastName.value,
-        email: email.value,
-        password: password.value,
-        password_confirmation: passwordConfirmation.value
-      })
-
-      await router.push('/login')
-    } catch (err) {
-      errorMessage.value = err instanceof Error ? err.message : 'Something went wrong.'
-      console.error(errorMessage)
-    } finally {
-      isSubmitting.value = false
-    }
-  }
-</script>
 
 <style scoped>
 .register-page {
