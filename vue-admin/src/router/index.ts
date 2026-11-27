@@ -9,6 +9,7 @@ import Link from '@/views/Link.vue'
 import Products from '@/views/product/Products.vue'
 import ProductForm from '@/views/product/ProductForm.vue'
 import Orders from '@/views/Orders.vue'
+import Profile from '@/views/Profile.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,7 @@ const router = createRouter({
         { path: '/', name: 'home-redirect', redirect: '/users' },
         { path: '/users', name: 'users', component: UsersTable},
         { path: '/user/:id/link', name: 'user-links', component: Link},
+        { path: '/profile', name: 'profile', component: Profile},
         { path: '/products', name: 'products', component: Products},
         { path: '/products/create', name: 'product-create', component: ProductForm},
         { path: '/products/:id/edit', name: 'product-edit', component: ProductForm},

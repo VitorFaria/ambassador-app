@@ -5,7 +5,15 @@
       <v-app-bar-title>Admin Checkout</v-app-bar-title>
       <v-spacer />
       <span v-if="user" class="mr-4">
-        {{  user.first_name }} {{  user.last_name }}
+        <router-link
+          class="
+          text-grey-darken-3 
+          text-decoration-none 
+          text-capitalize" 
+          to="/profile"
+        >
+          {{  user.first_name }} {{  user.last_name }}
+        </router-link>
       </span>
       <v-btn
         v-if="user"
