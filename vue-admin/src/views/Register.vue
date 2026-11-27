@@ -43,7 +43,7 @@
             :rules="passwordRules"
           />
           <AppTextField
-            v-model="confirmPassword"
+            v-model="passwordConfirmation"
             label="Password"
             type="password"
             autocomplete="current-password"
@@ -78,7 +78,7 @@ import { ref } from 'vue'
   const lastName = ref('')
   const email = ref('')
   const password = ref('')
-  const confirmPassword = ref('')
+  const passwordConfirmation = ref('')
   const errorMessage = ref<string | null>(null)
   const isSubmitting = ref(false)
 
@@ -112,7 +112,7 @@ import { ref } from 'vue'
         last_name: lastName.value,
         email: email.value,
         password: password.value,
-        password_confirmation: confirmPassword.value
+        password_confirmation: passwordConfirmation.value
       })
 
       await router.push('/login')
