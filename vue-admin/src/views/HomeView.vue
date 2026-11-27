@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { useRoute } from 'vue-router';
+
+  const route = useRoute()
+</script>
+
 <template>
   <v-container v-if="route.name === 'users'" class="py-12">
     <v-card class="mx-auto pa-6" rounded="lg">
@@ -9,15 +15,3 @@
   </v-container>
   <router-view v-else />
 </template>
-
-<script setup lang="ts">
-import type { RootState } from '@/store';
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-import { useStore } from 'vuex';
-
-  const route = useRoute()
-  const store = useStore<RootState>()
-  const user = computed(() => store.state.user)
-  console.log(user.value?.email);
-</script>
