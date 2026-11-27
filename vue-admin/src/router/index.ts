@@ -8,6 +8,7 @@ import UsersTable from '@/components/UsersTable.vue'
 import Link from '@/views/Link.vue'
 import Products from '@/views/product/Products.vue'
 import ProductForm from '@/views/product/ProductForm.vue'
+import Orders from '@/views/Orders.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,7 +33,8 @@ const router = createRouter({
         { path: '/user/:id/link', name: 'user-links', component: Link},
         { path: '/products', name: 'products', component: Products},
         { path: '/products/create', name: 'product-create', component: ProductForm},
-        { path: '/products/:id/edit', name: 'product-edit', component: ProductForm}
+        { path: '/products/:id/edit', name: 'product-edit', component: ProductForm},
+        { path: '/orders', name: 'orders', component: Orders}
       ],
       meta: { requiresAuth: true },
     },
